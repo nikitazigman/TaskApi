@@ -2,3 +2,7 @@ Django==3.2.7
 django-environ==0.6.0
 djangorestframework==3.12.4
 django-cors-headers==3.8.0
+django-allauth==0.45.0
+pyyaml==5.4.1
+uritemplate==3.0.1
+drf-yasg==1.20.0
