@@ -28,7 +28,7 @@ schema_view = get_schema_view(
         description="An API for WorkBalancer service",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="zigman.nikita.tech@gmail.com"),
-        license=openapi.License(name="BSD License"),
+        license=openapi.License(name="GPL-2.0 License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),

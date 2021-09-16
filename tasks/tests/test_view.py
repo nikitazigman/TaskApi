@@ -62,11 +62,14 @@ class TaskViewTest(TestCase):
             serialized_list_obj = ListSerializer(list_obj)
             self.assertEqual(serialized_list_obj.data, resp_obj)
 
+            self.assertTrue('number_active_tasks' in resp_obj.keys())
+            self.assertTrue('number_finished_tasks' in resp_obj.keys())
+
     def test_get_user_detailed_lists(self):
         list_id = 2
 
         self.assertTrue(self.client.login(username=self.username_one, password=self.password))
-        response = self.client.get(reverse('detailed-list', kwargs={'pk': list_id}))
+        response = self.client.get(reverse('tasks'), {'list_id': list_id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), self.task_number_in_one_list)
 
@@ -85,6 +88,19 @@ class TaskViewTest(TestCase):
 
         user = User.objects.get(username=self.username_one)
         tasks = Task.objects.filter(user_id=user)
+
+        for task_obj, resp_obj in zip(tasks, response.json()):
+            serialized_task_obj = TaskSerializer(task_obj)
+            self.assertEqual(serialized_task_obj.data, resp_obj)
+
+    def test_get_user_active_tasks(self):
+        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
+        response = self.client.get(reverse('tasks'), {'is_active': True})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), self.task_number_in_one_list * self.list_number)
+
+        user = User.objects.get(username=self.username_one)
+        tasks = Task.objects.filter(user_id=user, is_active=True)
 
         for task_obj, resp_obj in zip(tasks, response.json()):
             serialized_task_obj = TaskSerializer(task_obj)
