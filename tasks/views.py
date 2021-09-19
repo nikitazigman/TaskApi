@@ -2,9 +2,12 @@ import logging
 
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import List, Task
 from .serializers import ListSerializer, TaskSerializer
 from . import logics
+from .filters import TaskFilterSet
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -24,7 +27,7 @@ class TaskList(generics.ListAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['is_active', 'list_id']
+    filterset_class = TaskFilterSet
 
     def get_queryset(self):
         self.queryset = logics.filter_owner_data(user=self.request.user, queryset=self.queryset)

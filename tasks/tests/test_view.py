@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Union
 
 from django.test import TestCase
 from django.urls import reverse
@@ -49,6 +50,19 @@ class TaskViewTest(TestCase):
             tasks_in_list=self.task_number_in_one_list,
         )
 
+    def compare_response_with_queryset(self, response_json: dict, queryset: Union[List, Task]):
+        serializer_type = {
+            'Task': TaskSerializer,
+            'List': ListSerializer,
+        }
+
+        serializer = serializer_type[type(queryset.first()).__name__]
+
+        for query_obj, resp_obj in zip(queryset, response_json):
+            serialized_obj = serializer(query_obj)
+            print(f"{serialized_obj.data['id']=} == {resp_obj['id']=}")
+            self.assertEqual(serialized_obj.data, resp_obj)
+
     def test_get_user_lists(self):
         self.assertTrue(self.client.login(username=self.username_one, password=self.password))
         response = self.client.get(reverse('lists'))
@@ -58,12 +72,7 @@ class TaskViewTest(TestCase):
         user = User.objects.get(username=self.username_one)
         lists = List.objects.filter(user_id=user)
 
-        for list_obj, resp_obj in zip(lists, response.json()):
-            serialized_list_obj = ListSerializer(list_obj)
-            self.assertEqual(serialized_list_obj.data, resp_obj)
-
-            self.assertTrue('number_active_tasks' in resp_obj.keys())
-            self.assertTrue('number_finished_tasks' in resp_obj.keys())
+        self.compare_response_with_queryset(response_json=response.json(), queryset=lists)
 
     def test_get_user_detailed_lists(self):
         list_id = 2
@@ -76,9 +85,7 @@ class TaskViewTest(TestCase):
         user = User.objects.get(username=self.username_one)
         tasks = Task.objects.filter(user_id=user, list_id=list_id)
 
-        for task_obj, resp_obj in zip(tasks, response.json()):
-            serialized_task_obj = TaskSerializer(task_obj)
-            self.assertEqual(serialized_task_obj.data, resp_obj)
+        self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_tasks(self):
         self.assertTrue(self.client.login(username=self.username_one, password=self.password))
@@ -89,9 +96,7 @@ class TaskViewTest(TestCase):
         user = User.objects.get(username=self.username_one)
         tasks = Task.objects.filter(user_id=user)
 
-        for task_obj, resp_obj in zip(tasks, response.json()):
-            serialized_task_obj = TaskSerializer(task_obj)
-            self.assertEqual(serialized_task_obj.data, resp_obj)
+        self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_active_tasks(self):
         self.assertTrue(self.client.login(username=self.username_one, password=self.password))
@@ -102,9 +107,24 @@ class TaskViewTest(TestCase):
         user = User.objects.get(username=self.username_one)
         tasks = Task.objects.filter(user_id=user, is_active=True)
 
-        for task_obj, resp_obj in zip(tasks, response.json()):
-            serialized_task_obj = TaskSerializer(task_obj)
-            self.assertEqual(serialized_task_obj.data, resp_obj)
+        self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
+
+    def test_get_user_active_tasks_for_the_list(self):
+        list_id = 2
+        deadline_after = timezone.now().date() + timedelta(days=2)
+
+        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
+
+        response = self.client.get(reverse('tasks'), {
+            'is_active': True, 'excluded_list_id': list_id, 'deadline_after': str(deadline_after)
+        })
+
+        self.assertEqual(response.status_code, 200)
+
+        user = User.objects.get(username=self.username_one)
+        tasks = Task.objects.filter(user_id=user, is_active=True, deadline__gte=deadline_after).exclude(list_id=list_id)
+
+        self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_detailed_task(self):
         task_id = 2
@@ -130,9 +150,6 @@ class TaskViewTest(TestCase):
 
     def test_cannot_get_access_to_data_without_login(self):
         response = self.client.get(reverse('detailed-task', kwargs={'pk': 1}))
-        self.assertEqual(response.status_code, 403)
-
-        response = self.client.get(reverse('detailed-list', kwargs={'pk': 1}))
         self.assertEqual(response.status_code, 403)
 
         response = self.client.get(reverse('tasks'))
