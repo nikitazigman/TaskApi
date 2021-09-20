@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'django_filters',
+    'django_extensions',
     
     # local
     'tasks.apps.TasksConfig',
