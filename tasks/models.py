@@ -13,6 +13,9 @@ class List(models.Model):
 
     class Meta:
         ordering = ['-date_created']
+        constraints = [
+            models.UniqueConstraint(fields=['user_id', 'date_created'], name='unique_user_date_created'),
+        ]
 
 
 class Task(models.Model):
@@ -36,6 +39,6 @@ class Task(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=models.Q(difficulty__gte=1) & models.Q(difficulty__lte=11),
-                name='A difficulty value must in (1,11) range'
-            )
+                name='check_difficulty_range'
+            ),
         ]

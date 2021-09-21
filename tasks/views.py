@@ -5,22 +5,18 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import List, Task
 from .serializers import ListSerializer, TaskSerializer
-from . import logics
-from .filters import TaskFilterSet
+from .filters import TaskFilterSet, UserFilterSet
 
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 
-class ListList(generics.ListAPIView):
+class ListList(generics.ListCreateAPIView):
     queryset = List.objects.all()
     serializer_class = ListSerializer
-
-    def get_queryset(self):
-        self.queryset = logics.filter_owner_data(user=self.request.user, queryset=self.queryset)
-
-        return super().get_queryset()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = UserFilterSet
 
 
 class TaskList(generics.ListAPIView):
@@ -29,16 +25,9 @@ class TaskList(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = TaskFilterSet
 
-    def get_queryset(self):
-        self.queryset = logics.filter_owner_data(user=self.request.user, queryset=self.queryset)
-
-        return super().get_queryset()
-
 
 class TaskDetailed(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-
-    def get_queryset(self):
-        self.queryset = logics.filter_owner_data(user=self.request.user, queryset=self.queryset)
-        return super().get_queryset()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = UserFilterSet

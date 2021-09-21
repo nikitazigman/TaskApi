@@ -46,3 +46,31 @@ class TaskModelTest(TestCase):
                 deadline=timezone.now().date() + timedelta(100),
                 difficulty=12,
             )
+
+
+class ListModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='test', password='testpassword')
+        date = timezone.now()
+
+        for i in range(10):
+            List.objects.create(
+                user_id=self.user,
+                is_active=False,
+                date_created=date
+            )
+            date += timedelta(1)
+
+    def test_correct_sort(self):
+        lists = List.objects.values_list('date_created', flat=True)
+        sorted_lists = list(lists)
+        sorted_lists.sort(reverse=True)
+        self.assertEqual(list(lists), sorted_lists)
+
+    def test_unique_user_id_and_date_created(self):
+        with self.assertRaises(IntegrityError):
+            List.objects.create(
+                user_id=self.user,
+                is_active=False,
+                date_created=timezone.now()
+            )

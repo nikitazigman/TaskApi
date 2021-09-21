@@ -8,7 +8,13 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 
-class TaskFilterSet(FilterSet):
+class UserFilterSet(FilterSet):
+    def filter_queryset(self, queryset):
+        queryset = queryset.filter(user_id=self.request.user)
+        return super(UserFilterSet, self).filter_queryset(queryset)
+
+
+class TaskFilterSet(UserFilterSet):
     excluded_list_id = ModelChoiceFilter(
         queryset=List.objects.all(),
         label='excluded_list_id',
@@ -18,7 +24,7 @@ class TaskFilterSet(FilterSet):
     deadline = DateFromToRangeFilter()
 
     def exclude_list_id(self, queryset: Task, name, value):
-        logger.debug(f'before filtering: {name=}, {value=}')
+        logger.debug(f'got filtering args: {name=}, {value=}')
         queryset = queryset.all().exclude(**{name: value})
         return queryset
 
