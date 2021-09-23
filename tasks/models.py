@@ -5,7 +5,6 @@ from django.utils import timezone
 
 class List(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_active = models.BooleanField(default=False)
     date_created = models.DateField(auto_now=False)
 
     def __str__(self):

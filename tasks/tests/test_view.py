@@ -50,6 +50,8 @@ class TaskViewTest(TestCase):
             tasks_in_list=self.task_number_in_one_list,
         )
 
+        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
+
     def compare_response_with_queryset(self, response_json: dict, queryset: Union[List, Task]):
         serializer_type = {
             'Task': TaskSerializer,
@@ -64,7 +66,6 @@ class TaskViewTest(TestCase):
             self.assertEqual(serialized_obj.data, resp_obj)
 
     def test_get_user_lists(self):
-        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
         response = self.client.get(reverse('lists'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), self.list_number)
@@ -77,7 +78,6 @@ class TaskViewTest(TestCase):
     def test_get_user_detailed_lists(self):
         list_id = 2
 
-        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
         response = self.client.get(reverse('tasks'), {'list_id': list_id})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), self.task_number_in_one_list)
@@ -88,7 +88,6 @@ class TaskViewTest(TestCase):
         self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_tasks(self):
-        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
         response = self.client.get(reverse('tasks'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), self.task_number_in_one_list * self.list_number)
@@ -99,7 +98,6 @@ class TaskViewTest(TestCase):
         self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_active_tasks(self):
-        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
         response = self.client.get(reverse('tasks'), {'is_active': True})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), self.task_number_in_one_list * self.list_number)
@@ -112,8 +110,6 @@ class TaskViewTest(TestCase):
     def test_get_user_active_tasks_for_the_list(self):
         list_id = 2
         deadline_after = timezone.now().date() + timedelta(days=2)
-
-        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
 
         response = self.client.get(reverse('tasks'), {
             'is_active': True, 'excluded_list_id': list_id, 'deadline_after': str(deadline_after)
@@ -129,7 +125,6 @@ class TaskViewTest(TestCase):
     def test_get_user_detailed_task(self):
         task_id = 2
 
-        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
         response = self.client.get(reverse('detailed-task', kwargs={'pk': task_id}))
         self.assertEqual(response.status_code, 200)
 
@@ -138,7 +133,6 @@ class TaskViewTest(TestCase):
         self.assertEqual(serialized_task.data, response.json())
 
     def test_cannot_get_task_of_other_user(self):
-        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
 
         user = User.objects.get(username=self.username_two)
         user_two_task = Task.objects.filter(user_id=user).first()
@@ -149,6 +143,7 @@ class TaskViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_cannot_get_access_to_data_without_login(self):
+        self.client.logout()
         response = self.client.get(reverse('detailed-task', kwargs={'pk': 1}))
         self.assertEqual(response.status_code, 403)
 
@@ -157,3 +152,54 @@ class TaskViewTest(TestCase):
 
         response = self.client.get(reverse('lists'))
         self.assertEqual(response.status_code, 403)
+
+    def test_create_task(self):
+        task = {
+            'title': 'test_task',
+            'description': 'test_description',
+            'comments': 'test_comment',
+            'difficulty': 1,
+            'deadline': '2022-06-05',
+        }
+        response = self.client.post(
+            reverse('task-create'),
+            data=task
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(Task.objects.filter(title='test_task').exists())
+
+    def test_update_task(self):
+        task_id = Task.objects.first()
+
+        task_update = {'is_active': False}
+
+        response = self.client.patch(
+            reverse('detailed-task', kwargs={'pk': task_id.id}),
+            data=task_update,
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+
+        task = Task.objects.get(id=task_id.id)
+        self.assertEqual(task.is_active, task_update['is_active'])
+
+    def test_delete_task(self):
+        task_id = Task.objects.first()
+        response = self.client.delete(
+            reverse('detailed-task', kwargs={'pk': task_id.id})
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertTrue(
+            not Task.objects.filter(id=task_id.id).exists()
+        )
+
+    def test_list_create(self):
+        list = {
+            'date_created': '2020-06-06',
+        }
+        response = self.client.post(
+            reverse('list-create'),
+            data=list
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(List.objects.filter(date_created=list['date_created']).exists())

@@ -56,7 +56,6 @@ class ListModelTest(TestCase):
         for i in range(10):
             List.objects.create(
                 user_id=self.user,
-                is_active=False,
                 date_created=date
             )
             date += timedelta(1)
@@ -71,6 +70,5 @@ class ListModelTest(TestCase):
         with self.assertRaises(IntegrityError):
             List.objects.create(
                 user_id=self.user,
-                is_active=False,
                 date_created=timezone.now()
             )

@@ -17,8 +17,10 @@ Therefore, you can consider the application as a way to understand yourself and 
 | Endpoint                                   | HTTP Verb                    | 
 |--------------------------------------------|------------------------------|
 | api/v1/task/<int:pk>                       | GET, POST, PUT, PATCH, DEL   |
+| api/v1/task/create                         | POST                         |
 | api/v1/tasks                               | GET                          |
 | api/v1/lists                               | GET, POST                    | 
+| api/v1/list/create                         | POST                         |
 | api/v1/dj-rest-auth/registration           | POST                         |
 | api/v1/dj-rest-auth/login                  | POST                         |
 | api/v1/dj-rest-auth/logout                 | GET                          |
@@ -28,7 +30,7 @@ Therefore, you can consider the application as a way to understand yourself and 
 The full documentation you can find [here](doc/openapi-schema.yml)
 or you can run the service and open /redoc endpoint 
 
-#### api/v1/tasks 
+#### GET api/v1/tasks 
 
 You can add following filters to the request: 
 
@@ -43,6 +45,45 @@ You can add following filters to the request:
 example: 
     
     GET /api/v1/tasks/?is_active=true&deadline_after=2021-06-25&excluded_list_id=1
+
+#### CRUD api/v1/task/<int:pk> 
+
+JSON Properties: 
+
+| property name     | data format       | Description                                   |
+|-------------------|-------------------|-----------------------------------------------|
+| title         | str               | title of the task < 50    | 
+| description   | str               | description of the task   |
+| comments      | str               | comments of the task      | 
+| is_active     | bool              | task's status             |
+| difficulty    | int               | task's difficulty         |
+| deadline      | Date 'yyyy-mm-dd' | task's deadline           |
+| list_id       | int               | task's list, can be Null  |
+
+example:
+
+    POST /api/v1/task/1/
+    content_type = application/json
+    
+    {
+        "id": 1,
+        "title": "1",
+        "description": "1",
+        "comments": "1",
+        "is_active": true,
+        "difficulty": 1,
+        "number_of_movements": 0,
+        "deadline": "2021-09-24",
+        "list_id": 1
+    }
+
+#### POST api/v1/task/create
+
+*in progress* 
+
+#### POST api/v1/list/create
+
+*in progress*
 
 ### The database schema: 
 
