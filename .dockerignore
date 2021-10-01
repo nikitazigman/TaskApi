@@ -1,0 +1,4 @@
+*/venv
+*/doc
+!db.sqlite3
+!README.md
