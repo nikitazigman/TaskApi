@@ -224,3 +224,4 @@ class TaskViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
         self.assertTrue(List.objects.filter(date_created=list['date_created']).exists())
+        self.assertTrue(False)
