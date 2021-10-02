@@ -1,12 +1,18 @@
 from datetime import timedelta
 from typing import Union
+import logging
 
+from faker import Faker
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from tasks.models import Task, List
 from tasks.serializers import TaskSerializer, ListSerializer
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class TaskViewTest(TestCase):
@@ -17,23 +23,26 @@ class TaskViewTest(TestCase):
         for j in range(lists_number):
             list = List.objects.create(
                 user_id=user,
-                date_created=date
+                date_created=self.fake.date_between(start_date='-1y', end_date='+1y')
             )
             for i in range(tasks_in_list):
                 Task.objects.create(
                     user_id=user,
-                    title=f'test task {i} of {user.username}',
-                    description=f'test description {i} of {user.username}',
-                    comments=f'test comments {i} of {user.username}',
-                    deadline=date,
+                    title=self.fake.text(max_nb_chars=20),
+                    description=self.fake.text(max_nb_chars=100),
+                    comments=self.fake.text(max_nb_chars=100),
+                    deadline=self.fake.date_between(start_date='-1y', end_date='+1y'),
                     list_id=list,
                 )
                 date += timedelta(1)
 
     def setUp(self):
-        self.password = 'testpassword'
-        self.username_one = 'test_one'
-        self.username_two = 'test_two'
+        self.fake = Faker()
+
+        self.password = self.fake.password()
+        self.username_one = self.fake.name()
+        self.username_two = self.fake.name()
+
         self.list_number = 4
         self.task_number_in_one_list = 10
 
@@ -62,7 +71,7 @@ class TaskViewTest(TestCase):
 
         for query_obj, resp_obj in zip(queryset, response_json):
             serialized_obj = serializer(query_obj)
-            print(f"{serialized_obj.data['id']=} == {resp_obj['id']=}")
+            logger.debug(f"{serialized_obj.data['id']=} == {resp_obj['id']=}")
             self.assertEqual(serialized_obj.data, resp_obj)
 
     def test_get_user_lists(self):
@@ -76,7 +85,9 @@ class TaskViewTest(TestCase):
         self.compare_response_with_queryset(response_json=response.json(), queryset=lists)
 
     def test_get_user_detailed_lists(self):
-        list_id = 2
+        user = User.objects.get(username=self.username_one)
+        lists = List.objects.filter(user_id=user)
+        list_id = lists[2].id
 
         response = self.client.get(reverse('tasks'), {'list_id': list_id})
         self.assertEqual(response.status_code, 200)
@@ -108,7 +119,10 @@ class TaskViewTest(TestCase):
         self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_active_tasks_for_the_list(self):
-        list_id = 2
+        user = User.objects.get(username=self.username_one)
+        lists = List.objects.filter(user_id=user)
+        list_id = lists[2].id
+
         deadline_after = timezone.now().date() + timedelta(days=2)
 
         response = self.client.get(reverse('tasks'), {
@@ -123,7 +137,9 @@ class TaskViewTest(TestCase):
         self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_detailed_task(self):
-        task_id = 2
+        user = User.objects.get(username=self.username_one)
+        tasks = Task.objects.filter(user_id=user)
+        task_id = tasks[2].id
 
         response = self.client.get(reverse('detailed-task', kwargs={'pk': task_id}))
         self.assertEqual(response.status_code, 200)
@@ -169,7 +185,9 @@ class TaskViewTest(TestCase):
         self.assertTrue(Task.objects.filter(title='test_task').exists())
 
     def test_update_task(self):
-        task_id = Task.objects.first()
+        user = User.objects.get(username=self.username_one)
+        tasks = Task.objects.filter(user_id=user)
+        task_id = tasks[2]
 
         task_update = {'is_active': False}
 
@@ -184,7 +202,10 @@ class TaskViewTest(TestCase):
         self.assertEqual(task.is_active, task_update['is_active'])
 
     def test_delete_task(self):
-        task_id = Task.objects.first()
+        user = User.objects.get(username=self.username_one)
+        tasks = Task.objects.filter(user_id=user)
+        task_id = tasks[2]
+
         response = self.client.delete(
             reverse('detailed-task', kwargs={'pk': task_id.id})
         )
