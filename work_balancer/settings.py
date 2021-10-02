@@ -108,7 +108,7 @@ DATABASES = {
         'PORT': os.environ.get('POSTGRES_PORT')
     }
 }
-
+print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
