@@ -11,7 +11,7 @@ services:
     depends_on:
       - db
   db:
-    image: postgis/postgis:14rc1-master
+    image: postgres:14.0
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
