@@ -5,10 +5,11 @@
 ## About 
 
 Work balancer is a web application that will help you to understand how many task you can do per a day.
-Why is it necessary? 
-. It allows you to increase your work planning accuracy. The more linear your working activity the easier define deadlines. 
-. It reduces your working stress, over work and in the end burnout. 
-. It has positive effect on your personal brand. Your clients will be more confident in work with you if they would see you as well-organised employee. 
+Why is it necessary?\
+
+* It allows you to increase your work planning accuracy. The more linear your working activity the easier define deadlines. 
+* It reduces your working stress, over work and in the end burnout.
+* It has positive effect on your personal brand. Your clients will be more confident in work with you if they would see you as well-organised employee. 
 
 Therefore, you can consider the application as a way to understand yourself and tune your working activity, to make yourself more efficient. 
 
@@ -30,7 +31,8 @@ Therefore, you can consider the application as a way to understand yourself and 
 | api/v1/dj-rest-auth/password/reset/confirm | POST                         |
 
 The full documentation you can find [here](doc/openapi-schema.yml)
-or you can run the service and open /redoc endpoint 
+
+**You can run the service and open /redoc endpoint**
 
 #### GET api/v1/tasks 
 
@@ -92,10 +94,24 @@ example:
 ![db structure](doc/my_project_visualized.png)
 
 ## How to launch
+Start:
+```commandline
+    docker-compose up -d --build
+```
+Migrations:
+```commandline
+    docker-compose exec web python manage.py makemigrations
+    docker-compose exec web python manage.py migrate
+```
+Create superuser
+```commandline
+    docker-compose exec web python manage.py createsuperuser
+```
+Then go to the\
+[localhost:8000](localhost:8000)
 
-1. create venv 
-2. clone the repository
-3. activate the venv 
-4. cd into the cloned folder
-5. pip install -r requirements.txt
-6. python manage.py runserver
+Stop
+```commandline
+    docker-compose down
+```
+
