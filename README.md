@@ -1,3 +1,5 @@
+[![Django CI](https://github.com/nikitazigman/work_balancer/actions/workflows/django.yml/badge.svg?branch=master)](https://github.com/nikitazigman/work_balancer/actions/workflows/django.yml)
+[![codecov](https://codecov.io/gh/nikitazigman/work_balancer/branch/master/graph/badge.svg?token=I5U9GK3W1O)](https://codecov.io/gh/nikitazigman/work_balancer)
 # Work Balancer Back-end
 
 ## About 

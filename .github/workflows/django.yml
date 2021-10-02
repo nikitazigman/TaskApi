@@ -23,18 +23,6 @@ jobs:
           - 5431:5432
 
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-#    services:
-#      postgres:
-#        image: postgres
-#        env:
-#          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-#          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-#          POSTGRES_DB: ${{ secrets.POSTGRES_NAME }}
-#
-#        ports:
-#          5431:5432
-#
-#        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     strategy:
       max-parallel: 4
@@ -61,5 +49,20 @@ jobs:
         POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
 
       run: |
-        python manage.py test
-    
+        coverage run manage.py test && coverage report --fail-under=90 && coverage xml
+
+    - name: Report coverage to codecov
+      env:
+        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+        POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+        POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        directory: ./coverage/reports/
+        fail_ci_if_error: true
