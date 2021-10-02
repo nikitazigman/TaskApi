@@ -15,20 +15,20 @@ jobs:
       matrix:
         python-version: [3.9]
 
-    services:
-      postgres:
-        image: postgres:14.0
-        env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_NAME }}
-        ports:
-          ${{ secrets.POSTGRES_PORT }}:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+#    services:
+#      postgres:
+#        image: postgres:14.0
+#        env:
+#          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+#          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+#          POSTGRES_DB: ${{ secrets.POSTGRES_NAME }}
+#        ports:
+#          ${{ secrets.POSTGRES_PORT }}:5432
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
 
 
     steps:
@@ -42,7 +42,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run Tests
-
       env:
         DJANGO_SECRET_KEY: ${{ secrets.SECRET_KEY }}
         POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
