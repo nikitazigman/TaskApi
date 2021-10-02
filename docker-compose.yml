@@ -12,6 +12,8 @@ services:
       - db
   db:
     image: postgis/postgis:14rc1-master
+    ports:
+      - 5431:5432
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
