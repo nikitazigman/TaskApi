@@ -23,7 +23,7 @@ class TaskViewTest(TestCase):
         for j in range(lists_number):
             list = List.objects.create(
                 user_id=user,
-                date_created=self.fake.date_between(start_date='-1y', end_date='+1y')
+                date_created=date
             )
             for i in range(tasks_in_list):
                 Task.objects.create(
