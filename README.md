@@ -81,14 +81,6 @@ example:
         "list_id": 1
     }
 
-#### POST api/v1/task/create
-
-*in progress* 
-
-#### POST api/v1/list/create
-
-*in progress*
-
 ### The database schema: 
 
 ![db structure](doc/my_project_visualized.png)
