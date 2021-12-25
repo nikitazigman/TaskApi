@@ -45,6 +45,13 @@ jobs:
         flake8 .
 
     - name: Run Mypy
+      env:
+        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+        POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+        POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
       run: |
         mypy --config-file mypy.ini 
 
