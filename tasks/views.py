@@ -1,12 +1,16 @@
 import logging
 
-from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics
 
-from .models import List, Task
-from .serializers import ListSerializer, TaskSerializer, ListCreateSerializer, TaskCreateSerializer
 from .filters import TaskFilterSet, UserFilterSet
-
+from .models import List, Task
+from .serializers import (
+    ListCreateSerializer,
+    ListSerializer,
+    TaskCreateSerializer,
+    TaskSerializer,
+)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)

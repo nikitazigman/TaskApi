@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils import timezone
 
 
@@ -11,9 +11,11 @@ class List(models.Model):
         return f"List: {self.date_created.strftime('%Y/%m/%d')}"
 
     class Meta:
-        ordering = ['-date_created']
+        ordering = ["-date_created"]
         constraints = [
-            models.UniqueConstraint(fields=['user_id', 'date_created'], name='unique_user_date_created'),
+            models.UniqueConstraint(
+                fields=["user_id", "date_created"], name="unique_user_date_created"
+            ),
         ]
 
 
@@ -28,16 +30,18 @@ class Task(models.Model):
     number_of_movements = models.IntegerField(default=0)
     modified_at = models.DateTimeField(auto_now=True)
     deadline = models.DateField(default=timezone.now)
-    list_id = models.ForeignKey(List, related_name='tasks', null=True, blank=True, on_delete=models.SET_NULL)
+    list_id = models.ForeignKey(
+        List, related_name="tasks", null=True, blank=True, on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         return self.title
 
     class Meta:
-        ordering = ['deadline']
+        ordering = ["deadline"]
         constraints = [
             models.CheckConstraint(
                 check=models.Q(difficulty__gte=1) & models.Q(difficulty__lte=11),
-                name='check_difficulty_range'
+                name="check_difficulty_range",
             ),
         ]
