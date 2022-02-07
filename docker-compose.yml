@@ -3,25 +3,43 @@ version: '3.9'
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn -c conf/conf_prod.py
+#    command: python manage.py runserver
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - POSTGRES_NAME=${POSTGRES_NAME}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
+      - POSTGRES_PORT=5431
     volumes:
-      - .:/code
+      - static_volume:/code/staticfiles
     ports:
-      - 8000:8000
+      - 8000
     depends_on:
       - db
-  db:
 
+  nginx:
+    image: nginx:1.19.8-alpine
+    volumes:
+      - static_volume:/var/www/html/static
+      - ./config/nginx-conf.d:/etc/nginx/conf.d:ro
+      - ./self_certificates:/etc/nginx/ssl/:ro
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - web
+
+#  certbot:
+#    image: certbot/certbot:latest
+#    volumes:
+#      - ./certbot/www/:/var/www/certbot/:rw
+
+  db:
     image: postgres:14.0
     ports:
-      - 5431:5432
+      - 5431
     environment:
       - POSTGRES_DB=${POSTGRES_NAME}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -31,3 +49,4 @@ services:
 
 volumes:
   postgres_data:
+  static_volume:
