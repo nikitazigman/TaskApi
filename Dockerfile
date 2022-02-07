@@ -11,12 +11,15 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Set work directory
-
 WORKDIR /code
 
 # Install dependencies
-
-COPY requirements.txt /code/
+COPY ./requirements.txt /code/
 RUN pip install -r /code/requirements.txt
 
-COPY . /code/
+
+# copy project files
+COPY ./config/gunicorn /code/conf/
+COPY ./project /code/
+# RUN python /code/manage.py collectstatic
+

@@ -42,7 +42,7 @@ jobs:
 
     - name: Run flake8
       run: |
-        flake8 .
+        flake8 --config=config/linters_and_formatters/.flake8 project/
 
     - name: Run Mypy
       env:
@@ -53,7 +53,7 @@ jobs:
         POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
         POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
       run: |
-        mypy --config-file mypy.ini 
+        mypy --config-file config/linters_and_formatters/mypy.ini 
 
     - name: Run Tests
       env:
@@ -65,6 +65,7 @@ jobs:
         POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
 
       run: |
+        cd project 
         coverage run manage.py test && coverage report --fail-under=90 && coverage xml
 
     - name: Report coverage to codecov

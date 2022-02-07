@@ -1,4 +1,8 @@
 ### Python template
+# custom part
+
+self_certificates/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
