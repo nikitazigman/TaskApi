@@ -13,7 +13,8 @@ class Day(models.Model):
         ordering = ["-date_created"]
         constraints = [
             models.UniqueConstraint(
-                fields=["user_id", "date_created"], name="unique_user_date_created"
+                fields=["user_id", "date_created"],
+                name="unique_user_date_created",
             ),
         ]
 
@@ -31,7 +32,11 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     day = models.ForeignKey(
-        Day, related_name="tasks", null=True, blank=True, on_delete=models.SET_NULL
+        Day,
+        related_name="tasks",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
 
     def __str__(self):

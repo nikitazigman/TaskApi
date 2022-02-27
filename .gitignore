@@ -290,3 +290,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+
+# ignore migration files
+00*.py

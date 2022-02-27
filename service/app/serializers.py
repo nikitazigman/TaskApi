@@ -44,7 +44,12 @@ class DaySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Day
-        fields = ["id", "date_created", "number_finished_tasks", "number_active_tasks"]
+        fields = [
+            "id",
+            "date_created",
+            "number_finished_tasks",
+            "number_active_tasks",
+        ]
 
 
 class DayCreateSerializer(serializers.ModelSerializer):

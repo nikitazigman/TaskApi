@@ -62,13 +62,9 @@ class TaskViewTest(TestCase):
             tasks_in_list=self.task_number_in_one_list,
         )
 
-        self.assertTrue(
-            self.client.login(username=self.username_one, password=self.password)
-        )
+        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
 
-    def compare_response_with_queryset(
-        self, response_json: dict, queryset: Union[Day, Task]
-    ):
+    def compare_response_with_queryset(self, response_json: dict, queryset: Union[Day, Task]):
         serializer_type = {
             "Task": TaskSerializer,
             "Day": DaySerializer,
@@ -89,9 +85,7 @@ class TaskViewTest(TestCase):
         user = User.objects.get(username=self.username_one)
         days = Day.objects.filter(user_id=user.id)
 
-        self.compare_response_with_queryset(
-            response_json=response.json(), queryset=days
-        )
+        self.compare_response_with_queryset(response_json=response.json(), queryset=days)
 
     def test_get_user_detailed_lists(self):
         user = User.objects.get(username=self.username_one)
@@ -105,37 +99,33 @@ class TaskViewTest(TestCase):
         user = User.objects.get(username=self.username_one)
         tasks = Task.objects.filter(user_id=user.id, day=day_id)
 
-        self.compare_response_with_queryset(
-            response_json=response.json(), queryset=tasks
-        )
+        self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_tasks(self):
         response = self.client.get(reverse("task-list"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            len(response.json()), self.task_number_in_one_list * self.list_number
+            len(response.json()),
+            self.task_number_in_one_list * self.list_number,
         )
 
         user = User.objects.get(username=self.username_one)
         tasks = Task.objects.filter(user_id=user.id)
 
-        self.compare_response_with_queryset(
-            response_json=response.json(), queryset=tasks
-        )
+        self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_active_tasks(self):
         response = self.client.get(reverse("task-list"), {"completed": False})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            len(response.json()), self.task_number_in_one_list * self.list_number
+            len(response.json()),
+            self.task_number_in_one_list * self.list_number,
         )
 
         user = User.objects.get(username=self.username_one)
         tasks = Task.objects.filter(user_id=user.id, completed=False)
 
-        self.compare_response_with_queryset(
-            response_json=response.json(), queryset=tasks
-        )
+        self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_active_tasks_for_the_list(self):
         user = User.objects.get(username=self.username_one)
@@ -157,12 +147,12 @@ class TaskViewTest(TestCase):
 
         user = User.objects.get(username=self.username_one)
         tasks = Task.objects.filter(
-            user_id=user.id, completed=False, deadline__gte=deadline_after
+            user_id=user.id,
+            completed=False,
+            deadline__gte=deadline_after,
         ).exclude(day=day_id)
 
-        self.compare_response_with_queryset(
-            response_json=response.json(), queryset=tasks
-        )
+        self.compare_response_with_queryset(response_json=response.json(), queryset=tasks)
 
     def test_get_user_detailed_task(self):
         user = User.objects.get(username=self.username_one)
@@ -231,9 +221,7 @@ class TaskViewTest(TestCase):
         tasks = Task.objects.filter(user_id=user.id)
         task_id = tasks[2]
 
-        response = self.client.delete(
-            reverse("task-detailed", kwargs={"pk": task_id.id})
-        )
+        response = self.client.delete(reverse("task-detailed", kwargs={"pk": task_id.id}))
         self.assertEqual(response.status_code, 204)
         self.assertTrue(not Task.objects.filter(id=task_id.id).exists())
 

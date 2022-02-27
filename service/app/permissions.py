@@ -11,6 +11,6 @@ class IsOwner(permissions.IsAuthenticated):
         logger.debug(
             f"we got permission request from {request.user} of {obj.user_id} object {obj}"
         )
-        return obj.user_id == request.user and super(
-            IsOwner, self
-        ).has_object_permission(request, view, obj)
+        return obj.user_id == request.user and super(IsOwner, self).has_object_permission(
+            request, view, obj
+        )

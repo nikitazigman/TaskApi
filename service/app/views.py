@@ -5,12 +5,8 @@ from rest_framework import generics
 
 from .filters import TaskFilterSet, UserFilterSet
 from .models import Day, Task
-from .serializers import (
-    DayCreateSerializer,
-    DaySerializer,
-    TaskCreateSerializer,
-    TaskSerializer,
-)
+from .serializers import (DayCreateSerializer, DaySerializer,
+                          TaskCreateSerializer, TaskSerializer)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
