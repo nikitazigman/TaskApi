@@ -1,4 +1,4 @@
-name: Django CI
+name: auth CI
 
 on:
   push:
@@ -8,80 +8,78 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     services:
       db:
-        image: postgres:10.8
+        image: postgres:latest
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_NAME }}
 
         ports:
-          - 5431:5432
+          - 5432:5432
 
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.9]
+        python-version: [ 3.9 ]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Run flake8
-      run: |
-        flake8 --config=config/linters_and_formatters/.flake8 project/
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Run Mypy
-      env:
-        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-        POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-      run: |
-        mypy --config-file config/linters_and_formatters/mypy.ini 
+      - name: Run flake8
+        run: |
+          flake8 --config=conf/linters_and_fixers/.flake8 service
 
-    - name: Run Tests
-      env:
-        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-        POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      - name: Run Mypy
+        env:
+          DEBUG: 1
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          REDIS_IP: ${{ secrets.REDIS_IP }}
+          REDIS_PORT: 6379
+          CACHE_KEY_PREFIX: app
+        run: |
+          mypy --config-file conf/linters_and_fixers/mypy.ini
 
-      run: |
-        cd project 
-        coverage run  --rcfile=../config/coverage/.coveragerc manage.py test
-        coverage report --fail-under=90 
-        coverage xml
-
-    - name: Report coverage to codecov
-      env:
-        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-        POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: project/coverage.xml
-        directory: ./coverage/reports/
-        fail_ci_if_error: true
+      - name: Run Tests
+        env:
+          DEBUG: 1
+          APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
+          REST_API_KEY: ${{ secrets.REST_API_KEY }}
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          REDIS_IP: ${{ secrets.REDIS_IP }}
+          REDIS_PORT: 6379
+          CACHE_KEY_PREFIX: app
+        run: |
+          cd service/
+          python manage.py makemigrations
+          python manage.py migrate
+          python manage.py test
