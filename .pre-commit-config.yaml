@@ -3,7 +3,21 @@ repos:
     hooks:
       - id: CI
         name: run Sh CI script
-        entry: bash -c ""
+        entry: bash -c "black --config conf/linters_and_fixers/pyproject.toml service/"
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: CI
+        name: run Sh CI script
+        entry: bash -c "isort service/"
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: CI
+        name: run flake8
+        entry: bash -c "flake8 --config=conf/linters_and_fixers/.flake8 service"
         language: system
         types: [python]
         stages: [commit]
