@@ -1,0 +1,6 @@
+exclude_dirs:
+  - "/tests/"
+# skips:
+#   - "*/*_test.py"
+#   - "*/test_*.py"
+#   - "*/*gun*.py"

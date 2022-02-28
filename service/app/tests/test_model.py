@@ -52,7 +52,7 @@ class ListModelTest(TestCase):
         self.user = User.objects.create_user(username="test", password="testpassword")
         date = timezone.now()
 
-        for i in range(10):
+        for _ in range(10):
             Day.objects.create(user_id=self.user.id, date_created=date)
             date += timedelta(1)
 

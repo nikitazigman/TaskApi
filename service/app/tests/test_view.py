@@ -25,10 +25,10 @@ class TaskViewTest(TestCase):
         user = User.objects.create_user(username=username, password=password)
         date = timezone.now()
 
-        for j in range(lists_number):
+        for _ in range(lists_number):
             day = Day.objects.create(user_id=user.id, date_created=date)
 
-            for i in range(tasks_in_list):
+            for _ in range(tasks_in_list):
                 Task.objects.create(
                     user_id=user.id,
                     title=self.fake.text(max_nb_chars=20),
@@ -62,9 +62,13 @@ class TaskViewTest(TestCase):
             tasks_in_list=self.task_number_in_one_list,
         )
 
-        self.assertTrue(self.client.login(username=self.username_one, password=self.password))
+        self.assertTrue(
+            self.client.login(username=self.username_one, password=self.password)
+        )
 
-    def compare_response_with_queryset(self, response_json: dict, queryset: Union[Day, Task]):
+    def compare_response_with_queryset(
+        self, response_json: dict, queryset: Union[Day, Task]
+    ):
         serializer_type = {
             "Task": TaskSerializer,
             "Day": DaySerializer,
@@ -226,9 +230,9 @@ class TaskViewTest(TestCase):
         self.assertTrue(not Task.objects.filter(id=task_id.id).exists())
 
     def test_list_create(self):
-        list = {
+        day = {
             "date_created": "2020-06-06",
         }
-        response = self.client.post(reverse("task-detailed"), data=list)
+        response = self.client.post(reverse("task-detailed"), data=day)
         self.assertEqual(response.status_code, 201)
-        self.assertTrue(Day.objects.filter(date_created=list["date_created"]).exists())
+        self.assertTrue(Day.objects.filter(date_created=day["date_created"]).exists())

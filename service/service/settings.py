@@ -18,18 +18,27 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load .env file
-load_dotenv(BASE_DIR.parent.joinpath("conf/env/.dev-env"))
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get("DEBUG", True)
 
-# Initialising environment variables
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+if DEBUG == "false":
+    DEBUG = False
+
+# Load .dev-env file
+env_path = (
+    BASE_DIR.parent.joinpath("conf/env/.dev-env")
+    if DEBUG
+    else BASE_DIR.joinpath("conf/env/.prod-env")
+)
+
+print(f"{env_path=}")
+if not load_dotenv(BASE_DIR.parent.joinpath(env_path)):
+    raise FileNotFoundError("cannot load env file")
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = [
     os.environ.get("ALLOWED_HOSTS"),
