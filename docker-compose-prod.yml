@@ -6,16 +6,14 @@ services:
     volumes:
       - ./conf/nginx:/etc/nginx/conf.d:ro
       - static_volume:/var/www/html/static
-      - ./self_certificates:/etc/nginx/ssl/:ro
     ports:
       - 3000:80
-      - 443:443
     depends_on:
-      - web
+      - task_api
 
-  TaskAPI:
+  task_api:
     build: .
-    command: gunicorn -c conf/conf_prod.py
+    command: gunicorn -c conf/gunicorn.py
     environment:
       - DEBUG=false
     env_file:
@@ -30,7 +28,7 @@ services:
   db:
     image: postgres:14.0
     ports:
-      - 5431
+      - 5432
     env_file:
       - conf/env/.prod-env
     volumes:

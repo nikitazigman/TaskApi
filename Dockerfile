@@ -19,6 +19,6 @@ RUN pip install -r /code/requirements.txt
 
 
 # copy project files
-COPY ./config/gunicorn /code/conf/
-COPY ./project /code/
+COPY ./conf/gunicorn /code/conf/
+COPY ./service /code/
 # RUN python /code/manage.py collectstatic
