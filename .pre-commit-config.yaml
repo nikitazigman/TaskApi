@@ -25,25 +25,25 @@ repos:
     hooks:
       - id: isort
         args:
-          [--settings-path, conf/linters_and_fixers/pyproject.toml, service/]
+          [--settings-path, config/linters_and_fixers/pyproject.toml, service/]
 
   - repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 22.3.0
     hooks:
       - id: black
-        args: [--config, conf/linters_and_fixers/pyproject.toml, service/]
+        args: [--config, config/linters_and_fixers/pyproject.toml, service/]
 
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.2
     hooks:
       - id: bandit
-        args: [-r, -c, conf/linters_and_fixers/.bandit, service/]
+        args: [-r, -c, config/linters_and_fixers/.bandit, service/]
 
   - repo: https://github.com/PyCQA/flake8
     rev: 4.0.1
     hooks:
       - id: flake8 # E***, W***, F***
-        args: [--config, conf/linters_and_fixers/.flake8, service/]
+        args: [--config, config/linters_and_fixers/.flake8, service/]
         additional_dependencies:
           - dlint # DUO***
           - flake8-2020 # YTT***
