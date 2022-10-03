@@ -47,7 +47,7 @@ jobs:
 
       - name: Run flake8
         run: |
-          flake8 --config=conf/linters_and_fixers/.flake8 service
+          flake8 --config=config/linters_and_fixers/.flake8 service
 
       - name: Run Mypy
         env:
@@ -62,7 +62,7 @@ jobs:
           REDIS_PORT: 6379
           CACHE_KEY_PREFIX: app
         run: |
-          mypy --config-file conf/linters_and_fixers/mypy.ini
+          mypy --config-file config/linters_and_fixers/mypy.ini
 
       - name: Run Tests
         env:
