@@ -1,38 +1,36 @@
-version: '3.9'
+version: "3.9"
 
 services:
   nginx:
     image: nginx:1.19.8-alpine
     volumes:
-      - ./conf/nginx:/etc/nginx/conf.d:ro
+      - ./config/nginx-conf.d:/etc/nginx/conf.d:ro
       - static_volume:/var/www/html/static
-      - ./self_certificates:/etc/nginx/ssl/:ro
     ports:
-      - 3000:80
-      - 443:443
+      - 80:80
     depends_on:
-      - web
+      - task_api
 
-  TaskAPI:
+  task_api:
     build: .
-    command: gunicorn -c conf/conf_prod.py
+    command: gunicorn -c config/gunicorn.py
     environment:
-      - DEBUG=false
+      - DEBUG=true
     env_file:
-      - conf/env/.prod-env
+      - config/env/.prod-env
     volumes:
       - static_volume:/code/staticfiles
     ports:
-      - 8000
+      - 8000:8000
     depends_on:
       - db
 
   db:
     image: postgres:14.0
     ports:
-      - 5431
+      - 5432
     env_file:
-      - conf/env/.prod-env
+      - config/env/.prod-env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 

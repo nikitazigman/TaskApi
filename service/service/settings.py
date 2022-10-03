@@ -26,9 +26,9 @@ if DEBUG == "false":
 
 # Load .dev-env file
 env_path = (
-    BASE_DIR.parent.joinpath("conf/env/.dev-env")
+    BASE_DIR.parent.joinpath("config/env/.dev-env")
     if DEBUG
-    else BASE_DIR.joinpath("conf/env/.prod-env")
+    else BASE_DIR.joinpath("config/env/.prod-env")
 )
 
 print(f"{env_path=}")
