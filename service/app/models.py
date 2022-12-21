@@ -1,9 +1,13 @@
+from django.contrib.auth.models import User as DefaultUser
 from django.db import models
 from django.utils import timezone
 
+# class User(DefaultUser):
+#     ...
+
 
 class Day(models.Model):
-    user_id = models.IntegerField()
+    user = models.ForeignKey(DefaultUser, on_delete=models.CASCADE)
     date_created = models.DateField(auto_now=False)
 
     def __str__(self):
@@ -20,7 +24,7 @@ class Day(models.Model):
 
 
 class Task(models.Model):
-    user_id = models.IntegerField()
+    user = models.ForeignKey(DefaultUser, on_delete=models.CASCADE)
 
     title = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)

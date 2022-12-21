@@ -43,7 +43,7 @@ class TaskCreate(generics.CreateAPIView):
     serializer_class = TaskCreateSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user_id=self.request.user.id)
+        serializer.save(user=self.request.user)
 
 
 class TaskDetailed(generics.RetrieveUpdateDestroyAPIView):
