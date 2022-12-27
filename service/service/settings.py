@@ -43,7 +43,6 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
     os.environ.get("ALLOWED_HOSTS"),
     "localhost",
-    "127.0.0.1",
 ]
 
 
@@ -82,10 +81,15 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-CORS_ORIGIN_WHITELIST = (
-    "http://localhost:3000",
+CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
-)
+    "http://localhost:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+]
 
 ROOT_URLCONF = "service.urls"
 

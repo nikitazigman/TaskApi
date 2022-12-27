@@ -2,9 +2,6 @@ from django.contrib.auth.models import User as DefaultUser
 from django.db import models
 from django.utils import timezone
 
-# class User(DefaultUser):
-#     ...
-
 
 class Day(models.Model):
     user = models.ForeignKey(DefaultUser, on_delete=models.CASCADE)

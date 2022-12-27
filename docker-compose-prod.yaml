@@ -8,19 +8,16 @@ services:
       - static_volume:/var/www/html/static
     ports:
       - 80:80
+    depends_on:
       - task_api
 
   task_api:
     build: .
     command: gunicorn -c config/gunicorn.py
-    environment:
-      - DEBUG=true
     env_file:
       - config/env/.prod-env
     volumes:
       - static_volume:/code/staticfiles
-    ports:
-      - 8000:8000
     depends_on:
       - db
 
