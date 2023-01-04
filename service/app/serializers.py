@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from .models import Day, Task
+from .models import Task
 from django.contrib.auth.models import User
+from rest_framework.validators import UniqueTogetherValidator
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -28,11 +29,17 @@ class TaskSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "comments",
-            "difficulty",
+            "level",
             "deadline",
             "completed",
             "created_at",
-            "day",
+            "date",
+        ]
+        validators = [
+            UniqueTogetherValidator(
+                Task.objects.all(),
+                fields=["title", "deadline"],
+            ),
         ]
 
 
@@ -43,35 +50,13 @@ class TaskCreateSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "comments",
-            "difficulty",
+            "level",
             "deadline",
-            "day",
+            "date",
         ]
-
-
-class DaySerializer(serializers.ModelSerializer):
-    number_finished_tasks = serializers.SerializerMethodField()
-    number_active_tasks = serializers.SerializerMethodField()
-
-    def get_number_active_tasks(self, obj: Day):
-        return obj.tasks.filter(completed=False).count()
-
-    def get_number_finished_tasks(self, obj: Day):
-        return obj.tasks.filter(completed=True).count()
-
-    class Meta:
-        model = Day
-        fields = [
-            "id",
-            "date_created",
-            "number_finished_tasks",
-            "number_active_tasks",
-        ]
-
-
-class DayCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Day
-        fields = [
-            "date_created",
+        validators = [
+            UniqueTogetherValidator(
+                Task.objects.all(),
+                fields=["title", "deadline"],
+            ),
         ]

@@ -5,10 +5,8 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from .filters import TaskFilterSet, UserFilterSet
-from .models import Day, Task
+from .models import Task
 from .serializers import (
-    DayCreateSerializer,
-    DaySerializer,
     TaskCreateSerializer,
     TaskSerializer,
     RegisterSerializer,
@@ -24,21 +22,6 @@ class Register(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 
-class DayList(generics.ListAPIView):
-    queryset = Day.objects.all()
-    serializer_class = DaySerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = UserFilterSet
-
-
-class DayCreate(generics.CreateAPIView):
-    queryset = Day.objects.all()
-    serializer_class = DayCreateSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(user_id=self.request.user.id)
-
-
 class TaskList(generics.ListAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
@@ -51,7 +34,7 @@ class TaskCreate(generics.CreateAPIView):
     serializer_class = TaskCreateSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user=User.objects.get(id=self.request.user.id))
 
 
 class TaskDetailed(generics.RetrieveUpdateDestroyAPIView):
