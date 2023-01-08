@@ -60,14 +60,23 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "debug_toolbar",
-    "rest_framework_simplejwt",
     "corsheaders",
     "drf_yasg",
     "django_filters",
     "django_extensions",
+    "dj_rest_auth",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth.registration",
     # local
     "app.apps.AppConfig",
 ]
+
+SITE_ID = 1
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = "access"
+JWT_AUTH_REFRESH_COOKIE = "refresh"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -185,12 +194,12 @@ if DEBUG:
             "rest_framework.renderers.BrowsableAPIRenderer",
         ]
     )
-    default_authenticatoin.extend(
-        [
-            "rest_framework.authentication.SessionAuthentication",
-            "rest_framework.authentication.TokenAuthentication",
-        ]
-    )
+    # default_authenticatoin.extend(
+    #     [
+    #         "rest_framework.authentication.SessionAuthentication",
+    #         "rest_framework.authentication.TokenAuthentication",
+    #     ]
+    # )
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": default_render,
