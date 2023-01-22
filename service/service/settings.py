@@ -93,11 +93,13 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3000",
+    os.environ.get("ALLOWED_HOSTS"),
 ]
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3000",
+    os.environ.get("ALLOWED_HOSTS"),
 ]
 
 ROOT_URLCONF = "service.urls"
@@ -171,7 +173,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "/django-static/"
 STATIC_ROOT = PurePath(BASE_DIR).joinpath("staticfiles")
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -194,12 +196,7 @@ if DEBUG:
             "rest_framework.renderers.BrowsableAPIRenderer",
         ]
     )
-    # default_authenticatoin.extend(
-    #     [
-    #         "rest_framework.authentication.SessionAuthentication",
-    #         "rest_framework.authentication.TokenAuthentication",
-    #     ]
-    # )
+
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": default_render,
