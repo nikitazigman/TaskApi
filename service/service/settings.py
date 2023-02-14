@@ -9,39 +9,26 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
-import os
 from pathlib import Path, PurePath
 
-from dotenv import load_dotenv
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(BASE_DIR.joinpath("env/.env"))
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", True)
-
-if DEBUG == "false":
-    DEBUG = False
-
-# Load .dev-env file
-env_path = (
-    BASE_DIR.parent.joinpath("config/env/.dev-env")
-    if DEBUG
-    else BASE_DIR.joinpath("config/env/.prod-env")
-)
-
-print(f"{env_path=}")
-if not load_dotenv(BASE_DIR.parent.joinpath(env_path)):
-    raise FileNotFoundError("cannot load env file")
-
+DEBUG = env("DEBUG")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 
 ALLOWED_HOSTS = [
-    os.environ.get("ALLOWED_HOSTS"),
+    env("ALLOWED_HOSTS"),
     "localhost",
 ]
 
@@ -70,13 +57,12 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "dj_rest_auth.registration",
     # local
-    "app.apps.AppConfig",
+    # "app.apps.AppConfig",
+    "day",
+    "task",
+    "user",
 ]
 
-SITE_ID = 1
-REST_USE_JWT = True
-JWT_AUTH_COOKIE = "access"
-JWT_AUTH_REFRESH_COOKIE = "refresh"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -93,13 +79,13 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3000",
-    os.environ.get("ALLOWED_HOSTS"),
+    f"http://{env('ALLOWED_HOSTS')}",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3000",
-    os.environ.get("ALLOWED_HOSTS"),
+    f"http://{env('ALLOWED_HOSTS')}",
 ]
 
 ROOT_URLCONF = "service.urls"
@@ -129,11 +115,11 @@ WSGI_APPLICATION = "service.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_NAME"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": os.environ.get("POSTGRES_HOST"),
-        "PORT": os.environ.get("POSTGRES_PORT"),
+        "NAME": env("POSTGRES_NAME"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": env("POSTGRES_HOST"),
+        "PORT": env("POSTGRES_PORT"),
     }
 }
 
@@ -182,10 +168,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # REST FRAEMOWRK
-default_authenticatoin = [
-    "rest_framework_simplejwt.authentication.JWTTokenUserAuthentication",
-]
-
 default_render = [
     "rest_framework.renderers.JSONRenderer",
 ]
@@ -203,11 +185,15 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    "DEFAULT_AUTHENTICATION_CLASSES": default_authenticatoin,
+    "DEFAULT_FILTER_BACKENDS": ["service.filters.BelongToOwnerFilter"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["dj_rest_auth.jwt_auth.JWTCookieAuthentication"],
 }
 
 # JWT simple Authentication
+SITE_ID = 1
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = "access"
+JWT_AUTH_REFRESH_COOKIE = "refresh"
 
 SIMPLE_JWT = {
     "ALGORITHM": "HS256",
@@ -224,21 +210,15 @@ SIMPLE_JWT = {
 
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{os.environ.get('REDIS_IP')}:{os.environ.get('REDIS_PORT')}",
-        "OPTIONS": {
-            "db": "10",
-            "parser_class": "redis.connection.PythonParser",
-            "pool_class": "redis.BlockingConnectionPool",
-        },
-        "KEY_PREFIX": {os.environ.get("CACHE_KEY_PREFIX")},
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{env('REDIS_IP')}:{env('REDIS_PORT')}",
     }
 }
 
 # Debug tool
-
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-SITE_ID = 1
+# USER
+AUTH_USER_MODEL = "user.WorkBalancerUser"
