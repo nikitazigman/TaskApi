@@ -11,6 +11,8 @@ django-filter==22.1
 django_debug_toolbar==3.8.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
+# test
+pytest-django==4.5.2
 # docs
 drf-yasg==1.21.4
 # tools
