@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
-from . import models, serializers, filters
+
+from . import filters, models, serializers
 
 
 class TaskViewSet(ModelViewSet):

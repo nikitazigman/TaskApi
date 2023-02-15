@@ -1,4 +1,5 @@
-from django_filters.rest_framework import FilterSet, BooleanFilter
+from django_filters.rest_framework import BooleanFilter, FilterSet
+
 from .models import Task
 
 
@@ -9,4 +10,4 @@ class TaskFilterSet(FilterSet):
 
     class Meta:
         model = Task
-        fields = ["completed", "deadline"]
+        fields = ["completed", "days", "archived"]

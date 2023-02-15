@@ -1,7 +1,7 @@
 from django.test import TestCase
-from task.serializers import TaskSerializer
 from model_bakery import baker
 from task.models import Task
+from task.serializers import TaskSerializer
 
 
 class TaskSerializerTestCase(TestCase):
@@ -11,7 +11,7 @@ class TaskSerializerTestCase(TestCase):
         self.assertNotIn("user", serializer.data)
 
     def test_data_fields(self):
-        essential_fields = {"title", "level", "deadline", "completed_at", "day"}
+        essential_fields = {"title", "level", "deadline", "completed", "days"}
 
         baker.make("task.Task")
         serializer = TaskSerializer(Task.objects.first())

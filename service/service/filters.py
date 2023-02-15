@@ -1,6 +1,6 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from django.http import HttpRequest
 from django.db.models import QuerySet
+from django.http import HttpRequest
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class BelongToOwnerFilter(DjangoFilterBackend):

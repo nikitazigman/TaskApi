@@ -1,9 +1,8 @@
+from django.db import IntegrityError
 from django.test import TestCase
+from faker import Faker
 from model_bakery import baker
 from task.models import Task
-from day.models import Day
-from django.db import IntegrityError
-from faker import Faker
 
 
 class TaskTestCase(TestCase):
@@ -15,7 +14,9 @@ class TaskTestCase(TestCase):
         baker.make("task.Task", deadline=None)
 
     def test_day_can_be_null(self) -> None:
-        baker.make("task.Task", day=None)
+        # * by default the baker creates empty field
+        # * if null property of model was set to True
+        baker.make("task.Task")
 
     def test_completed_at_can_be_null(self) -> None:
         baker.make("task.Task", completed_at=None)
@@ -44,14 +45,3 @@ class TaskTestCase(TestCase):
     def test_level_constrains_out_of_upper_limit_level(self) -> None:
         with self.assertRaises(IntegrityError):
             baker.make("task.Task", level=11)
-
-    def test_day_cascade_delete(self) -> None:
-        origin_quantity = 5
-        baker.make("day.Day")
-        day = Day.objects.first()
-        baker.make("task.Task", day=day, _quantity=origin_quantity)
-
-        self.assertEqual(Task.objects.filter(day=day).count(), origin_quantity)
-
-        day.delete()
-        self.assertEqual(Task.objects.filter(day=day).count(), 0)
