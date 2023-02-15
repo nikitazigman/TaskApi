@@ -38,6 +38,20 @@ class DayViewTestCase(TestCase):
             self.assertIn("assigned_tasks", returned_day)
             self.assertIn("completed_tasks", returned_day)
 
+    def test_can_filter_by_date(self) -> None:
+        day = Day.objects.filter(user__username=self.users[0].username).first()
+        serializer = DaySerializer(day)
+        expected_day = serializer.data
+
+        response = self.client.get(reverse("day-list"), data={"date": str(day.date)})
+
+        self.assertEqual(response.status_code, 200)
+        returned_day = response.json()
+
+        self.assertEqual(len(returned_day["results"]), 1)
+
+        self.assertEqual(returned_day["results"][0], dict(expected_day))
+
     def test_get_detailed_day(self) -> None:
         day = Day.objects.filter(user__username=self.users[0].username).first()
         serializer = DaySerializer(day)
