@@ -25,7 +25,9 @@ class TaskViewTestCase(TestCase):
 
         user_tasks_models = Task.objects.filter(user__username=self.users[0].username)
         serializer = TaskSerializer(user_tasks_models, many=True)
-        for response_task, model_task in zip(response.json(), serializer.data):
+        for response_task, model_task in zip(
+            response.json()["results"], serializer.data[:20]
+        ):
             self.assertDictEqual(response_task, dict(model_task))
 
     def test_get_filtered_task_list_by_deadline(self) -> None:
@@ -39,7 +41,9 @@ class TaskViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         serializer = TaskSerializer(expected_tasks, many=True)
-        for response_task, model_task in zip(response.json(), serializer.data):
+        for response_task, model_task in zip(
+            response.json()["results"], serializer.data[:20]
+        ):
             self.assertDictEqual(response_task, dict(model_task))
 
     def test_get_filtered_task_list_by_completed(self) -> None:
@@ -52,7 +56,9 @@ class TaskViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         serializer = TaskSerializer(expected_tasks, many=True)
-        for response_task, model_task in zip(response.json(), serializer.data):
+        for response_task, model_task in zip(
+            response.json()["results"], serializer.data[:20]
+        ):
             self.assertDictEqual(response_task, dict(model_task))
 
     def test_get_detailed_task(self) -> None:
