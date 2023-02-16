@@ -45,8 +45,8 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None | str:
         fake = Faker()
         self.random = SystemRandom()
-        for user in WorkBalancerUser.objects.exclude(username="admin").iterator():
-            user.delete()
+        for wb_user in WorkBalancerUser.objects.exclude(username="admin").iterator():
+            wb_user.delete()
 
         users_quantity = options["users_quantity"]
         days_per_user = options["days_per_user"]
@@ -60,18 +60,20 @@ class Command(BaseCommand):
         for user in users:
             WorkBalancerUser.objects.create_user(**user)
 
-        for user in WorkBalancerUser.objects.all().iterator():
+        for wb_user in WorkBalancerUser.objects.all().iterator():
             unique_dates = (
                 fake.unique.date_time(tzinfo=get_current_timezone())
                 for _ in range(days_per_user)
             )
             days = baker.make(
-                "day.Day", user=user, date=unique_dates, _quantity=days_per_user
+                "day.Day", user=wb_user, date=unique_dates, _quantity=days_per_user
             )
             self.generate_tasks_for_the_day(
                 days=days,
-                user=user,
+                user=wb_user,
                 quantity=max_tasks_per_day,
                 fake=fake,
                 max_tasks_per_day=max_tasks_per_day,
             )
+
+        return None

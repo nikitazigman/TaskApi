@@ -8,5 +8,5 @@ class TaskViewSet(ModelViewSet):
     serializer_class = serializers.TaskSerializer
     filterset_class = filters.TaskFilterSet
 
-    def perform_create(self, serializer: serializers.TaskSerializer):
+    def perform_create(self, serializer):
         serializer.save(user=self.request.user)

@@ -1,10 +1,10 @@
-name: auth CI
+name: WorkBalancer API CI
 
 on:
   push:
     branches: [master]
   pull_request:
-    branches: [master]
+    branches: [master, development]
 
 jobs:
   build:
@@ -31,7 +31,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.9]
+        python-version: [3.11]
 
     steps:
       - uses: actions/checkout@v2
@@ -40,44 +40,26 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Dependencies
+      - name: Build
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          echo "${{ secrets.ENV_FILE }}" > service/django_configs/.env
+          echo "${{ secrets.POSTGRES_USER }}" >> service/django_configs/.env
+          echo ${{ secrets.POSTGRES_PASSWORD }} >> service/django_configs/.env
+          echo ${{ secrets.POSTGRES_NAME }} >> service/django_configs/.env
+          cat service/django_configs/.env
 
-      - name: Run flake8
-        run: |
-          flake8 --config=config/linters_and_fixers/.flake8 service
 
-      - name: Run Mypy
-        env:
-          DEBUG: 1
-          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          REDIS_IP: localhost
-          REDIS_PORT: 6379
-          CACHE_KEY_PREFIX: app
-        run: |
-          mypy --config-file config/linters_and_fixers/mypy.ini
+      - name: pre-commit check up 
+        run: pre-commit run -a
 
-      - name: Run Tests
-        env:
-          DEBUG: 1
-          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          REDIS_IP: localhost
-          REDIS_PORT: 6379
-          CACHE_KEY_PREFIX: app
+      - name: MyPy check up  
+        run: mypy service
+
+      - name: Testing
         run: |
           cd service/
           python manage.py makemigrations
           python manage.py migrate
-          python manage.py test
+          pytest 

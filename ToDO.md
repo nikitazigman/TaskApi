@@ -1,6 +1,5 @@
 # TODO
 
-* add basic pagination
 * add CI for the github
 * add registration and auth through an email 
 * add cache for the history and backlog

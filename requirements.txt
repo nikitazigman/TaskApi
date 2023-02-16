@@ -1,7 +1,4 @@
-bandit>=1.7.4
-black>=23.1.0
 dj-rest-auth==2.2.7
-# django
 Django==4.1.6
 django-allauth==0.52.0
 django-cors-headers==3.13.0
@@ -11,20 +8,29 @@ django-filter==22.1
 django_debug_toolbar==3.8.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
-# test
-pytest-django==4.5.2
-# docs
+psycopg2-binary==2.9.5
+Markdown==3.4.1
 drf-yasg==1.21.4
+redis==4.5.0
+
+# stubs
+django-stubs=>1.14.0
+djangorestframework-stubs=>1.8.0
+django-filter-stubs==0.1.2
+drf-yasg-stubs==0.1.4
+
+# test
+pytest-django=>.5.2
+model_bakery=>1.10.1
+
 # tools
 flake8>=6.0.0
+mypy=>1.0.0
+pre-commit=>3.0.4
+isort>=5.12.0
+bandit>=1.7.4
+black>=23.1.0
+
 # wsgi
 gunicorn==20.1.0
-isort>=5.12.0
-Markdown==3.4.1
-# testing
-model_bakery=>1.10.1
-psycopg2-binary==2.9.5
-# redis
-redis==4.5.0
-# ros
-roslibpy==1.4.1
+

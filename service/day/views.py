@@ -8,5 +8,5 @@ class DayViewSet(ModelViewSet):
     serializer_class = serializers.DaySerializer
     filterset_fields = ["date"]
 
-    def perform_create(self, serializer: serializers.DaySerializer) -> None:
+    def perform_create(self, serializer) -> None:
         serializer.save(user=self.request.user)
