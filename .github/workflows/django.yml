@@ -48,8 +48,6 @@ jobs:
           echo "${{ secrets.POSTGRES_USER }}" >> service/django_configs/.env
           echo ${{ secrets.POSTGRES_PASSWORD }} >> service/django_configs/.env
           echo ${{ secrets.POSTGRES_NAME }} >> service/django_configs/.env
-          cat service/django_configs/.env
-
 
       - name: pre-commit check up 
         run: pre-commit run -a
