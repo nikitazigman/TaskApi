@@ -7,7 +7,7 @@ services:
     ports:
       - 5432:5432
     env_file:
-      - config/env/.dev-env
+      - service/django_configs/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
