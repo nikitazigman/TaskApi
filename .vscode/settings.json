@@ -2,6 +2,7 @@
     "python.formatting.provider": "black",
     "cSpell.words": [
         "allauth",
+        "apikey",
         "authtoken",
         "Browsable",
         "corsheaders",
@@ -10,6 +11,7 @@
         "makemigrations",
         "mypy",
         "pytest",
+        "sendgrid",
         "simplejwt",
         "socialaccount",
         "viewsets",

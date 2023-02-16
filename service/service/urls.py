@@ -39,6 +39,7 @@ urlpatterns = [
     path("api/v1/", include("task.urls")),
     path("api/v1/", include("day.urls")),
     path("api/v1/auth/", include("dj_rest_auth.urls")),
+    path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     path(
         "redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"  # type: ignore
     ),
