@@ -17,7 +17,7 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(DEBUG=(bool, False))
-environ.Env.read_env(BASE_DIR.joinpath("env/.env"))
+environ.Env.read_env(BASE_DIR.joinpath("django_configs/.env"))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -167,7 +167,7 @@ STATIC_ROOT = PurePath(BASE_DIR).joinpath("staticfiles")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# REST FRAEMOWRK
+# REST FRAMEWORK
 default_render = [
     "rest_framework.renderers.JSONRenderer",
 ]
