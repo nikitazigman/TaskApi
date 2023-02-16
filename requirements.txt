@@ -22,7 +22,7 @@ drf-yasg-stubs==0.1.4
 # test
 pytest-django>=4.5.2
 model_bakery>=1.10.1
-
+Faker>=17.0.0
 # tools
 flake8>=6.0.0
 mypy>=1.0.0
