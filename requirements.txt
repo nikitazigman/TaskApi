@@ -20,7 +20,7 @@ django-filter-stubs==0.1.2
 drf-yasg-stubs==0.1.4
 
 # test
-pytest-django>=.5.2
+pytest-django>=4.5.2
 model_bakery>=1.10.1
 
 # tools
