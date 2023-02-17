@@ -1,6 +1,6 @@
 # Pull base image
 
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 # Update base
 RUN apt-get update

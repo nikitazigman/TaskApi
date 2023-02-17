@@ -3,49 +3,33 @@ info:
   title: ''
   version: ''
 paths:
-  /api/v1/lists/:
-    get:
-      operationId: listLists
-      description: ''
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/List'
-          description: ''
-      tags:
-      - api
   /api/v1/tasks/:
     get:
       operationId: listTasks
       description: ''
       parameters:
-      - name: is_active
+      - name: page
         required: false
         in: query
-        description: is_active
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: completed
+        required: false
+        in: query
+        description: completed
         schema:
           type: string
-      - name: list_id
+      - name: days
         required: false
         in: query
-        description: list_id
+        description: days
         schema:
           type: string
-      - name: deadline
+      - name: archived
         required: false
         in: query
-        description: deadline
-        schema:
-          type: string
-      - name: excluded_list_id
-        required: false
-        in: query
-        description: excluded_list_id
+        description: archived
         schema:
           type: string
       responses:
@@ -53,13 +37,53 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Task'
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://api.example.org/accounts/?page=4
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://api.example.org/accounts/?page=2
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
           description: ''
       tags:
       - api
-  /api/v1/task/{id}/:
+    post:
+      operationId: createTask
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Task'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+      tags:
+      - api
+  /api/v1/tasks/{id}/:
     get:
       operationId: retrieveTask
       description: ''
@@ -68,6 +92,24 @@ paths:
         in: path
         required: true
         description: A unique integer value identifying this task.
+        schema:
+          type: string
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: days
+        required: false
+        in: query
+        description: days
+        schema:
+          type: string
+      - name: archived
+        required: false
+        in: query
+        description: archived
         schema:
           type: string
       responses:
@@ -87,6 +129,24 @@ paths:
         in: path
         required: true
         description: A unique integer value identifying this task.
+        schema:
+          type: string
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: days
+        required: false
+        in: query
+        description: days
+        schema:
+          type: string
+      - name: archived
+        required: false
+        in: query
+        description: archived
         schema:
           type: string
       requestBody:
@@ -119,6 +179,24 @@ paths:
         description: A unique integer value identifying this task.
         schema:
           type: string
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: days
+        required: false
+        in: query
+        description: days
+        schema:
+          type: string
+      - name: archived
+        required: false
+        in: query
+        description: archived
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -149,12 +227,217 @@ paths:
         description: A unique integer value identifying this task.
         schema:
           type: string
+      - name: completed
+        required: false
+        in: query
+        description: completed
+        schema:
+          type: string
+      - name: days
+        required: false
+        in: query
+        description: days
+        schema:
+          type: string
+      - name: archived
+        required: false
+        in: query
+        description: archived
+        schema:
+          type: string
       responses:
         '204':
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/logout/:
+  /api/v1/days/:
+    get:
+      operationId: listDays
+      description: ''
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: date
+        required: false
+        in: query
+        description: date
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://api.example.org/accounts/?page=4
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://api.example.org/accounts/?page=2
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Day'
+          description: ''
+      tags:
+      - api
+    post:
+      operationId: createDay
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Day'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Day'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Day'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Day'
+          description: ''
+      tags:
+      - api
+  /api/v1/days/{id}/:
+    get:
+      operationId: retrieveDay
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this day.
+        schema:
+          type: string
+      - name: date
+        required: false
+        in: query
+        description: date
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Day'
+          description: ''
+      tags:
+      - api
+    put:
+      operationId: updateDay
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this day.
+        schema:
+          type: string
+      - name: date
+        required: false
+        in: query
+        description: date
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Day'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Day'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Day'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Day'
+          description: ''
+      tags:
+      - api
+    patch:
+      operationId: partialUpdateDay
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this day.
+        schema:
+          type: string
+      - name: date
+        required: false
+        in: query
+        description: date
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Day'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Day'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Day'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Day'
+          description: ''
+      tags:
+      - api
+    delete:
+      operationId: destroyDay
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this day.
+        schema:
+          type: string
+      - name: date
+        required: false
+        in: query
+        description: date
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - api
+  /api/v1/auth/logout/:
     get:
       operationId: listLogouts
       description: 'Calls Django logout method and delete the Token object
@@ -199,7 +482,7 @@ paths:
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/user/:
+  /api/v1/auth/user/:
     get:
       operationId: retrieveUserDetails
       description: 'Reads and updates UserModel fields
@@ -297,7 +580,7 @@ paths:
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/password/reset/:
+  /api/v1/auth/password/reset/:
     post:
       operationId: createPasswordReset
       description: 'Calls Django Auth PasswordResetForm save method.
@@ -327,7 +610,7 @@ paths:
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/password/reset/confirm/:
+  /api/v1/auth/password/reset/confirm/:
     post:
       operationId: createPasswordResetConfirm
       description: "Password reset e-mail link is confirmed, therefore\nthis resets\
@@ -354,7 +637,7 @@ paths:
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/login/:
+  /api/v1/auth/login/:
     post:
       operationId: createLogin
       description: 'Check the credentials and return the REST Token
@@ -390,7 +673,7 @@ paths:
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/password/change/:
+  /api/v1/auth/password/change/:
     post:
       operationId: createPasswordChange
       description: 'Calls Django Auth SetPasswordForm save method.
@@ -420,7 +703,60 @@ paths:
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/registration/:
+  /api/v1/auth/token/verify/:
+    post:
+      operationId: createTokenVerify
+      description: 'Takes a token and indicates if it is valid.  This view provides
+        no
+
+        information about a token''s fitness for a particular use.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+      tags:
+      - api
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: createCookieTokenRefresh
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CookieTokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CookieTokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CookieTokenRefresh'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CookieTokenRefresh'
+          description: ''
+      tags:
+      - api
+  /api/v1/auth/registration/:
     post:
       operationId: createRegister
       description: ''
@@ -445,7 +781,7 @@ paths:
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/registration/verify-email/:
+  /api/v1/auth/registration/verify-email/:
     post:
       operationId: createVerifyEmail
       description: ''
@@ -470,9 +806,9 @@ paths:
           description: ''
       tags:
       - api
-  /api/v1/dj-rest-auth/registration/resend-email/:
+  /api/v1/auth/registration/resend-email/:
     post:
-      operationId: createResendEmailVerification
+      operationId: createEmailAddress
       description: ''
       parameters: []
       requestBody:
@@ -497,68 +833,54 @@ paths:
       - api
 components:
   schemas:
-    List:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        number_finished_tasks:
-          type: string
-          readOnly: true
-        number_active_tasks:
-          type: string
-          readOnly: true
-        is_active:
-          type: boolean
-        date_created:
-          type: string
-          format: date
-        user_id:
-          type: integer
-      required:
-      - date_created
-      - user_id
     Task:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
+        completed:
+          type: boolean
         title:
           type: string
-          maxLength: 200
-        description:
-          type: string
-          nullable: true
-        comments:
-          type: string
-          nullable: true
-        is_active:
-          type: boolean
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        difficulty:
+          maxLength: 150
+        level:
           type: integer
-        number_of_movements:
-          type: integer
-        modified_at:
-          type: string
-          format: date-time
-          readOnly: true
+          maximum: 2147483647
+          minimum: -2147483648
         deadline:
           type: string
           format: date
-        user_id:
-          type: integer
-        list_id:
-          type: integer
           nullable: true
+        archived:
+          type: boolean
+        days:
+          type: array
+          items:
+            type: integer
       required:
       - title
-      - user_id
+    Day:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        completed_tasks:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        assigned_tasks:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        date:
+          type: string
+          format: date
+      required:
+      - date
     UserDetails:
       type: object
       properties:
@@ -633,6 +955,22 @@ components:
       required:
       - new_password1
       - new_password2
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+      - token
+    CookieTokenRefresh:
+      type: object
+      properties:
+        refresh:
+          type: string
+          description: WIll override cookie.
+        access:
+          type: string
+          readOnly: true
     Register:
       type: object
       properties:
@@ -651,6 +989,7 @@ components:
           writeOnly: true
       required:
       - username
+      - email
       - password1
       - password2
     VerifyEmail:
@@ -658,6 +997,7 @@ components:
       properties:
         key:
           type: string
+          writeOnly: true
       required:
       - key
     ResendEmailVerification:
@@ -666,3 +1006,5 @@ components:
         email:
           type: string
           format: email
+      required:
+      - email

@@ -293,3 +293,6 @@ cython_debug/
 
 # ignore migration files
 00*.py
+
+# django-static files
+/service/staticfiles/

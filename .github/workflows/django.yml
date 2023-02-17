@@ -45,10 +45,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: pre-commit check up 
+      - name: pre-commit check up
         run: pre-commit run -a
 
-      - name: MyPy check up  
+      - name: MyPy check up
         env:
           REDIS_IP: ${{ secrets.REDIS_IP }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
@@ -78,4 +78,4 @@ jobs:
           cd service/
           python manage.py makemigrations
           python manage.py migrate
-          pytest 
+          pytest --cov=. --cov-fail-under=90
