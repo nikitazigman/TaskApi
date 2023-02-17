@@ -93,3 +93,4 @@ python manage.py generate_test_data
 ## Technical debts:
 * Cache. The load on the service is super low. Currently, I am a single user :D, but it is not cool to have a backend without cache)
 * Email verification (It is necessary to get more familiar with the law before storing and sending emails)
+* Docstrings 
