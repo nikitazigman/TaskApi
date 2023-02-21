@@ -8,4 +8,4 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Task
-        exclude = ["user", "completed_at"]
+        exclude = ["user"]
