@@ -1,11 +1,11 @@
 from day.models import Day
 from day.serializers import DaySerializer
 from django.core.management import call_command
+from django.db.models import QuerySet
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from user.models import WorkBalancerUser
-from django.db.models import QuerySet
 
 
 class DayViewTestCase(TestCase):
