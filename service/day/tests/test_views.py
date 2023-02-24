@@ -5,9 +5,12 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from user.models import WorkBalancerUser
+from django.db.models import QuerySet
 
 
 class DayViewTestCase(TestCase):
+    users: "QuerySet[WorkBalancerUser]"
+
     @classmethod
     def setUpTestData(cls) -> None:
         call_command("generate_test_data")
@@ -86,6 +89,22 @@ class DayViewTestCase(TestCase):
         day_user = Day.objects.get(id=returned_day["id"]).user
         client_user = WorkBalancerUser.objects.get(username=self.users[0].username)
         self.assertEqual(day_user.id, client_user.id)
+
+    def test_create_if_exist(self) -> None:
+        existing_day = Day.objects.filter(user=self.users[0]).first()
+        if existing_day is None:
+            raise ValueError()
+
+        new_day = {
+            "date": existing_day.date,
+        }
+        response = self.client.post(reverse("day-list"), data=new_day, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        returned_day = response.json()
+
+        self.assertIn("id", returned_day)
+        self.assertEqual(existing_day.id, returned_day["id"])
 
     def test_update(self) -> None:
         test_date = "2020-01-01"
