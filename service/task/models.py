@@ -43,6 +43,10 @@ class Task(models.Model):
             self.completed_at = None
             return None
 
+        if not status:
+            self.completed_at = None
+            return None
+
         if len(self.days.all()) == 0:
             raise RuntimeError(
                 "The task cannot be completed since the task object does not have any assigned days"

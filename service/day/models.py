@@ -11,4 +11,4 @@ class Day(models.Model):
         unique_together = ["user", "date"]
 
     def __str__(self) -> str:
-        return str(self.date)
+        return f"{self.id} {self.date}"

@@ -32,11 +32,9 @@ class DayViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         returned_days = response.json()
 
-        self.assertEqual(len(returned_days["results"]), len(expected_days[:20]))
+        self.assertEqual(len(returned_days), len(expected_days))
 
-        for returned_day, expected_day in zip(
-            returned_days["results"], expected_days[:20]
-        ):
+        for returned_day, expected_day in zip(returned_days, expected_days):
             self.assertEqual(returned_day, dict(expected_day))
             self.assertIn("assigned_tasks", returned_day)
             self.assertIn("completed_tasks", returned_day)
@@ -51,9 +49,9 @@ class DayViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         returned_day = response.json()
 
-        self.assertEqual(len(returned_day["results"]), 1)
+        self.assertEqual(len(returned_day), 1)
 
-        self.assertEqual(returned_day["results"][0], dict(expected_day))
+        self.assertEqual(returned_day[0], dict(expected_day))
 
     def test_get_detailed_day(self) -> None:
         day = Day.objects.filter(user__username=self.users[0].username).first()

@@ -3,6 +3,7 @@ from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 from task.models import Task
+from day.models import Day
 
 
 class TaskTestCase(TestCase):
@@ -45,3 +46,20 @@ class TaskTestCase(TestCase):
     def test_level_constrains_out_of_upper_limit_level(self) -> None:
         with self.assertRaises(IntegrityError):
             baker.make("task.Task", level=11)
+
+    def test_can_complete_the_task(self) -> None:
+        day = baker.make(Day)
+        task = baker.make(Task, completed_at=None, days=[day])
+
+        task.completed = True
+        self.assertEqual(task.completed_at.id, task.days.first().id)
+
+    def test_undo_task_complete(self) -> None:
+        day = baker.make(Day)
+        task = baker.make(Task, completed_at=day, days=[day])
+
+        self.assertTrue(task.completed)
+        task.completed = False
+
+        self.assertEqual(task.completed_at, None)
+        self.assertFalse(task.completed)
