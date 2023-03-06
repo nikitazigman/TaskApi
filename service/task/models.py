@@ -39,10 +39,6 @@ class Task(models.Model):
         if type(status) != bool:
             raise TypeError("The property accept only bool type")
 
-        if self.id is None:
-            self.completed_at = None
-            return None
-
         if not status:
             self.completed_at = None
             return None
