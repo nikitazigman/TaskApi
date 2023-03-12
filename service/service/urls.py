@@ -23,11 +23,11 @@ from . import settings
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="TaskAPI",
-        default_version="v1",
-        description="An TaskAPI for work balancer service",
+        title="WorkBalancer API",
+        default_version="v1.1",
+        description="Backend for the workbalancer service",
         terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="zigman.nikita.tech@gmail.com"),
+        contact=openapi.Contact(email="zigman.nikita@gmail.com"),
         license=openapi.License(name="GPL-2.0 License"),
     ),
     public=True,
@@ -36,7 +36,10 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/task/", include("app.urls")),
+    path("api/v1/", include("task.urls")),
+    path("api/v1/", include("day.urls")),
+    path("api/v1/auth/", include("dj_rest_auth.urls")),
+    path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     path(
         "redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"  # type: ignore
     ),

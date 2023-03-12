@@ -9,41 +9,27 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
-import os
 from pathlib import Path, PurePath
 
-from dotenv import load_dotenv
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(BASE_DIR.joinpath("django_configs/.env"))
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", True)
-
-if DEBUG == "false":
-    DEBUG = False
-
-# Load .dev-env file
-env_path = (
-    BASE_DIR.parent.joinpath("config/env/.dev-env")
-    if DEBUG
-    else BASE_DIR.joinpath("config/env/.prod-env")
-)
-
-print(f"{env_path=}")
-if not load_dotenv(BASE_DIR.parent.joinpath(env_path)):
-    raise FileNotFoundError("cannot load env file")
-
+DEBUG = env("DEBUG")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 
 ALLOWED_HOSTS = [
-    os.environ.get("ALLOWED_HOSTS"),
+    env("ALLOWED_HOSTS"),
     "localhost",
-    "127.0.0.1",
 ]
 
 
@@ -61,14 +47,22 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "debug_toolbar",
-    "rest_framework_simplejwt",
     "corsheaders",
     "drf_yasg",
     "django_filters",
     "django_extensions",
+    "dj_rest_auth",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth.registration",
     # local
-    "app.apps.AppConfig",
+    # "app.apps.AppConfig",
+    "day",
+    "task",
+    "user",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -82,10 +76,17 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-CORS_ORIGIN_WHITELIST = (
-    "http://localhost:3000",
+CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
-)
+    "http://localhost:3000",
+    f"http://{env('ALLOWED_HOSTS')}",
+]
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+    f"http://{env('ALLOWED_HOSTS')}",
+]
 
 ROOT_URLCONF = "service.urls"
 
@@ -114,11 +115,11 @@ WSGI_APPLICATION = "service.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_NAME"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": os.environ.get("POSTGRES_HOST"),
-        "PORT": os.environ.get("POSTGRES_PORT"),
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": env("POSTGRES_HOST"),
+        "PORT": env("POSTGRES_PORT"),
     }
 }
 
@@ -158,7 +159,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "/django-static/"
 STATIC_ROOT = PurePath(BASE_DIR).joinpath("staticfiles")
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -166,11 +167,7 @@ STATIC_ROOT = PurePath(BASE_DIR).joinpath("staticfiles")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# REST FRAEMOWRK
-default_authenticatoin = [
-    "rest_framework_simplejwt.authentication.JWTTokenUserAuthentication",
-]
-
+# REST FRAMEWORK
 default_render = [
     "rest_framework.renderers.JSONRenderer",
 ]
@@ -181,23 +178,33 @@ if DEBUG:
             "rest_framework.renderers.BrowsableAPIRenderer",
         ]
     )
-    default_authenticatoin.extend(
-        [
-            "rest_framework.authentication.SessionAuthentication",
-            "rest_framework.authentication.TokenAuthentication",
-        ]
-    )
+
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": default_render,
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    "DEFAULT_AUTHENTICATION_CLASSES": default_authenticatoin,
+    "DEFAULT_FILTER_BACKENDS": ["service.filters.BelongToOwnerFilter"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["dj_rest_auth.jwt_auth.JWTCookieAuthentication"],
 }
 
-# JWT simple Authentication
+# DJ_REST_AUTH
+SITE_ID = 1
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = "access"
+JWT_AUTH_REFRESH_COOKIE = "refresh"
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = "username"
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
 
 SIMPLE_JWT = {
     "ALGORITHM": "HS256",
@@ -206,30 +213,37 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-    "AUTH_TOKEN_CLASSES": ("service.tokens.NoVerrificationAccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
 }
+
+# !It is essential to get more familiar with the law and and so on before to store and send emails
+# EMAIL
+# if DEBUG:
+#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# else:
+# EMAIL_HOST = "smtp.sendgrid.net"
+# EMAIL_HOST_USER = "apikey"
+# EMAIL_HOST_PASSWORD = env("SENDGRID_API_KEY")
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+
+# DEFAULT_FROM_EMAIL = env("FROM_EMAIL")
+# LOGIN_REDIRECT_URL = "success"
 
 # Cache
 
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{os.environ.get('REDIS_IP')}:{os.environ.get('REDIS_PORT')}",
-        "OPTIONS": {
-            "db": "10",
-            "parser_class": "redis.connection.PythonParser",
-            "pool_class": "redis.BlockingConnectionPool",
-        },
-        "KEY_PREFIX": {os.environ.get("CACHE_KEY_PREFIX")},
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{env('REDIS_IP')}:{env('REDIS_PORT')}",
     }
 }
 
 # Debug tool
-
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-SITE_ID = 1
+# USER
+AUTH_USER_MODEL = "user.WorkBalancerUser"

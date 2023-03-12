@@ -1,10 +1,10 @@
-name: auth CI
+name: WorkBalancer API CI
 
 on:
   push:
     branches: [master]
   pull_request:
-    branches: [master]
+    branches: [master, development]
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_NAME }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
         ports:
           - 5432:5432
@@ -31,7 +31,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.9]
+        python-version: [3.11]
 
     steps:
       - uses: actions/checkout@v2
@@ -40,44 +40,42 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Dependencies
+      - name: Build
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run flake8
-        run: |
-          flake8 --config=config/linters_and_fixers/.flake8 service
+      - name: pre-commit check up
+        run: pre-commit run -a
 
-      - name: Run Mypy
+      - name: MyPy check up
         env:
-          DEBUG: 1
+          REDIS_IP: ${{ secrets.REDIS_IP }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+          DEBUG: True
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          REDIS_IP: localhost
-          REDIS_PORT: 6379
-          CACHE_KEY_PREFIX: app
-        run: |
-          mypy --config-file config/linters_and_fixers/mypy.ini
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+        run: mypy service
 
-      - name: Run Tests
+      - name: Testing
         env:
-          DEBUG: 1
+          REDIS_IP: ${{ secrets.REDIS_IP }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+          DEBUG: True
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          REDIS_IP: localhost
-          REDIS_PORT: 6379
-          CACHE_KEY_PREFIX: app
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
         run: |
           cd service/
           python manage.py makemigrations
           python manage.py migrate
-          python manage.py test
+          pytest --cov=. --cov-fail-under=90
