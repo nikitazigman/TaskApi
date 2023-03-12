@@ -1,9 +1,9 @@
+from day.models import Day
 from django.db import IntegrityError
 from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 from task.models import Task
-from day.models import Day
 
 
 class TaskTestCase(TestCase):

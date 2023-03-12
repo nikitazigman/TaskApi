@@ -1,11 +1,11 @@
 from django.core.management import call_command
+from django.db.models import QuerySet
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from task.models import Task
 from task.serializers import TaskSerializer
 from user.models import WorkBalancerUser
-from django.db.models import QuerySet
 
 
 class TaskViewTestCase(TestCase):

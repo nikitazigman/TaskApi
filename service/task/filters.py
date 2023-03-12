@@ -1,7 +1,8 @@
-from django_filters.rest_framework import FilterSet
-from django_filters import filters
-from .models import Task
 from day.models import Day
+from django_filters import filters
+from django_filters.rest_framework import FilterSet
+
+from .models import Task
 
 
 class TaskFilterSet(FilterSet):
